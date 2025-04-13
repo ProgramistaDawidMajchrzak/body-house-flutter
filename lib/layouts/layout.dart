@@ -1,3 +1,4 @@
+import 'package:body_house_app/widgets/custom_nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'dart:ui';
 import '../core/theme/colors.dart';
@@ -122,6 +123,10 @@ class Layout extends StatelessWidget {
         typeWidget = const SizedBox();
     }
 
-    return Scaffold(backgroundColor: AppColors.background, body: typeWidget);
+    return Scaffold(
+      bottomNavigationBar: CustomNavBar(),
+      backgroundColor: AppColors.background,
+      body: typeWidget,
+    );
   }
 }

@@ -32,33 +32,66 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
+    Widget _widget;
+    switch (_type) {
+      case 1:
+        _widget = SvgPicture.asset(
+          'assets/images/logo1.svg',
+          width: 120,
+          height: 120,
+        );
+        break;
+      case 2:
+        _widget = SvgPicture.asset(
+          'assets/images/logo2.svg',
+          width: 120,
+          height: 120,
+        );
+        break;
+      case 3:
+        _widget = SvgPicture.asset(
+          'assets/images/logo-big.svg',
+          width: 120,
+          height: 120,
+        );
+        break;
+        break;
+
+      case 4:
+        _widget = GradientText(
+          type: 2,
+          child: AppText(
+            'Добро пожаловать в Body House!',
+            // size: 24,
+            // weight: FontWeight.bold,
+            align: TextAlign.center,
+          ),
+        );
+        break;
+      default:
+        _widget = GradientText(
+          type: 2,
+          child: AppText(
+            'Добро пожаловать в Body House!',
+            // size: 24,
+            // weight: FontWeight.bold,
+            align: TextAlign.center,
+          ),
+        );
+    }
     return Layout(
       type: _type,
-      child: Center(
-        child: Column(
-          children: [
-            GestureDetector(
-              onTap: _changeType,
-              child: AnimatedOpacity(
-                duration: const Duration(milliseconds: 300),
-                opacity: _opacity,
-                child: SvgPicture.asset(
-                  'assets/images/logo-big.svg',
-                  width: 120,
-                  height: 120,
-                ),
-              ),
+      child: GestureDetector(
+        onTap: _changeType,
+        child: AnimatedOpacity(
+          duration: const Duration(milliseconds: 300),
+          opacity: _opacity,
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [_widget],
             ),
-            GradientText(
-              type: 2,
-              child: AppText(
-                'Добро пожаловать в Body House!',
-                // size: 24,
-                // weight: FontWeight.bold,
-                align: TextAlign.center,
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
