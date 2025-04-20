@@ -36,6 +36,10 @@ dependencies:
   cupertino_icons: ^1.0.8
   flutter_svg: ^2.0.17
   page_transition: ^2.2.1
+  blur: ^4.0.2
+  flutter_facebook_auth: ^7.1.1
+  http: ^1.3.0
+  flutter_secure_storage: ^9.2.4
 
 dev_dependencies:
   flutter_test:
@@ -69,6 +73,17 @@ flutter:
     - assets/images/logo-big.svg
     - assets/images/ellipse.png
     - assets/images/ellipse.svg
+
+    - assets/nav_icons/home.svg
+    - assets/nav_icons/home_active.svg
+    - assets/nav_icons/sessions.svg
+    - assets/nav_icons/sessions_active.svg
+    - assets/nav_icons/calendar.svg
+    - assets/nav_icons/calendar_active.svg
+    - assets/nav_icons/profile.svg
+    - assets/nav_icons/profile_active.svg
+
+    - assets/images/nav_bar_logo.svg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

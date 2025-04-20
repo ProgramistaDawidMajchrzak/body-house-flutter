@@ -1,71 +1,64 @@
+import 'dart:ui';
+import 'package:body_house_app/core/theme/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
-class CustomNavBar extends StatefulWidget {
+class CustomNavBar extends StatelessWidget {
   const CustomNavBar({super.key});
-
-  @override
-  State<CustomNavBar> createState() => CustomNavBarWidgetState();
-}
-
-class CustomNavBarWidgetState extends State<CustomNavBar> {
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
     final route = ModalRoute.of(context);
-    final currentPath = route?.settings.name ?? 'No path';
-    return Padding(
-      padding: const EdgeInsets.all(20.0),
-      child: Container(
-        // /width: MediaQuery.of(context).size.width - 200,
-        decoration: const BoxDecoration(
-          color: Color(0xFFE9E9F0),
-          borderRadius: BorderRadius.all(Radius.circular(40.0)),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              IconButton(
-                icon: Icon(
-                  Icons.home_outlined,
-                  color:
-                      currentPath == '/'
-                          ? const Color(0xFF3787EB)
-                          : Colors.grey,
+    final currentPath = route?.settings.name ?? '/home';
+
+    return SafeArea(
+      top: false,
+      child: ClipRRect(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            decoration: BoxDecoration(color: Colors.white.withOpacity(0.2)),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _buildIcon(
+                  context,
+                  currentPath: currentPath,
+                  path: '/home',
+                  icon: 'home',
                 ),
-                onPressed: () {
-                  Navigator.pushNamed(context, '/');
-                },
-              ),
-              _buildCenterButton(),
-              IconButton(
-                icon: Icon(
-                  Icons.list_alt,
-                  color:
-                      currentPath == '/sessions'
-                          ? const Color(0xFF3787EB)
-                          : Colors.grey,
+                _buildIcon(
+                  context,
+                  currentPath: currentPath,
+                  path: '/sessions',
+                  icon: 'sessions',
                 ),
-                onPressed: () {
-                  Navigator.pushNamed(context, '/sessions');
-                },
-              ),
-            ],
+                _buildCenterButton(context),
+                _buildIcon(
+                  context,
+                  currentPath: currentPath,
+                  path: '/calendar',
+                  icon: 'calendar',
+                ),
+                _buildIcon(
+                  context,
+                  currentPath: currentPath,
+                  path: '/profile',
+                  icon: 'profile',
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildCenterButton() {
+  Widget _buildCenterButton(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF3787EB),
+        color: AppColors.black,
         borderRadius: BorderRadius.circular(20.0),
       ),
       child: IconButton(
@@ -74,6 +67,25 @@ class CustomNavBarWidgetState extends State<CustomNavBar> {
           Navigator.pushNamed(context, '/shop');
         },
       ),
+    );
+  }
+
+  Widget _buildIcon(
+    BuildContext context, {
+    required String currentPath,
+    required String path,
+    required String icon,
+  }) {
+    final isActive = currentPath == path;
+    return IconButton(
+      icon: SvgPicture.asset(
+        'assets/nav_icons/$icon${isActive ? "_active" : ""}.svg',
+        width: 50,
+        height: 50,
+      ),
+      onPressed: () {
+        Navigator.pushNamed(context, path);
+      },
     );
   }
 }

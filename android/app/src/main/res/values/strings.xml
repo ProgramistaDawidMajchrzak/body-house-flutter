@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">body_house_app</string>
+
+    <string name="facebook_app_id">700565772456187</string>
+    <string name="fb_login_protocol_scheme">fb700565772456187</string>
+    <string name="facebook_client_token">baecaa2fd1c0133fda8d77102504b2f9</string>
+</resources>
+

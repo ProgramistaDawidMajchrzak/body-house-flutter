@@ -1,3 +1,4 @@
+import 'package:body_house_app/widgets/custom_app_bar.dart';
 import 'package:body_house_app/widgets/custom_nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'dart:ui';
@@ -124,6 +125,7 @@ class Layout extends StatelessWidget {
     }
 
     return Scaffold(
+      appBar: CustomAppBar(),
       bottomNavigationBar: CustomNavBar(),
       backgroundColor: AppColors.background,
       body: typeWidget,

@@ -55,8 +55,6 @@ class _SplashScreenState extends State<SplashScreen> {
           height: 120,
         );
         break;
-        break;
-
       case 4:
         _widget = GradientText(
           type: 2,
