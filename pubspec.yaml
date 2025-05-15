@@ -73,6 +73,7 @@ flutter:
     - assets/images/logo-big.svg
     - assets/images/ellipse.png
     - assets/images/ellipse.svg
+    - assets/images/auth_ellipse.svg
 
     - assets/nav_icons/home.svg
     - assets/nav_icons/home_active.svg
@@ -105,6 +106,13 @@ flutter:
         - asset: assets/fonts/Montserrat_Alternates/MontserratAlternates-Regular.ttf
         - asset: assets/fonts/Montserrat_Alternates/MontserratAlternates-Thin.ttf
           style: italic
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter/static/Inter_18pt-Medium.ttf
+        - asset: assets/fonts/Inter/static/Inter_18pt-Bold.ttf
+        - asset: assets/fonts/Inter/static/Inter_18pt-SemiBold.ttf
+        - asset: assets/fonts/Inter/static/Inter_18pt-Regular.ttf
+          style: normal
     # - family: Trajan Pro
     #   fonts:
     #     - asset: fonts/TrajanPro.ttf

@@ -43,9 +43,7 @@ class Layout extends StatelessWidget {
                 child: Container(color: Colors.transparent),
               ),
             ),
-            SafeArea(
-              child: Padding(padding: const EdgeInsets.all(16.0), child: child),
-            ),
+            SafeArea(child: child),
           ],
         );
         break;
@@ -115,9 +113,7 @@ class Layout extends StatelessWidget {
                 child: Container(color: Colors.transparent),
               ),
             ),
-            SafeArea(
-              child: Padding(padding: const EdgeInsets.all(16.0), child: child),
-            ),
+            SafeArea(child: child),
           ],
         );
       default:
