@@ -8,8 +8,14 @@ import 'package:flutter_svg/flutter_svg.dart';
 class Layout extends StatelessWidget {
   final Widget child;
   final int type;
+  final bool showBottomNavBar;
 
-  const Layout({super.key, required this.child, this.type = 1});
+  const Layout({
+    super.key,
+    required this.child,
+    this.type = 1,
+    this.showBottomNavBar = true,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -122,7 +128,7 @@ class Layout extends StatelessWidget {
 
     return Scaffold(
       appBar: CustomAppBar(),
-      bottomNavigationBar: CustomNavBar(),
+      bottomNavigationBar: showBottomNavBar ? CustomNavBar() : null,
       backgroundColor: AppColors.background,
       body: typeWidget,
     );

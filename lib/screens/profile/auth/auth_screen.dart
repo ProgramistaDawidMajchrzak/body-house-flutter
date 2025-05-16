@@ -13,8 +13,21 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 final FlutterSecureStorage secureStorage = FlutterSecureStorage();
 
-class AuthScreen extends StatelessWidget {
+class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
+
+  @override
+  State<AuthScreen> createState() => _AuthScreenState();
+}
+
+class _AuthScreenState extends State<AuthScreen> {
+  String selectedTab = "Sign Up"; // domyślnie Sign Up
+
+  void onTabChanged(String tab) {
+    setState(() {
+      selectedTab = tab;
+    });
+  }
 
   Future<void> loginWithFacebook() async {
     final result = await FacebookAuth.i.login(
@@ -61,13 +74,14 @@ class AuthScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     return Layout(
+      showBottomNavBar: false,
       type: 4,
       child: Column(
         children: [
           SizedBox(
-            height: size.height * 0.17,
+            height: size.height * 0.20,
             child: Padding(
-              padding: EdgeInsets.only(top: 32.0, left: 16.0),
+              padding: EdgeInsets.only(top: 32.0, left: 16.0, right: 16.0),
               child: Column(
                 spacing: 8.0,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -77,7 +91,7 @@ class AuthScreen extends StatelessWidget {
                     child: AppText('Начни сейчас', align: TextAlign.left),
                   ),
                   AppText(
-                    'Создайте учетную запись или войдите в систему, чтобы узнать больше о нашем приложении',
+                    'Создайте аккаунт или войдите, чтобы узнать больше о нашем приложении',
                     align: TextAlign.left,
                     size: 12.0,
                     color: AppColors.lightText,
@@ -107,21 +121,23 @@ class AuthScreen extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.max,
                 children: [
-                  Tabbing(),
-                  const SizedBox(height: 22),
+                  Tabbing(selectedTab: selectedTab, onTabChanged: onTabChanged),
+                  const SizedBox(height: 24),
                   Text(
-                    'Sign Up',
+                    selectedTab == "Sign Up" ? 'Зарегистрироваться' : 'Войти',
                     style: TextStyle(
                       color: Color(0xFF111827),
-                      fontSize: 32,
+                      fontSize: 28,
                       fontWeight: FontWeight.w700,
                       fontFamily: 'Inter',
                       letterSpacing: -0.64,
                     ),
                   ),
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 8),
                   Text(
-                    'Введите свой адрес электронной почты и пароль для регистрации',
+                    selectedTab == "Sign Up"
+                        ? 'Введите свой email и пароль, чтобы зарегистрироваться'
+                        : 'Введите свою эл. почту и пароль, чтобы войти',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Color(0xFF6C7278),
@@ -131,8 +147,11 @@ class AuthScreen extends StatelessWidget {
                       letterSpacing: -0.12,
                     ),
                   ),
-                  const SizedBox(height: 14),
-                  SignIn(),
+                  const SizedBox(height: 24),
+                  SignIn(
+                    selectedTab: selectedTab,
+                    onFacebookLogin: loginWithFacebook,
+                  ),
                 ],
               ),
             ),
@@ -144,114 +163,141 @@ class AuthScreen extends StatelessWidget {
 }
 
 class Tabbing extends StatelessWidget {
-  const Tabbing({super.key});
+  final String selectedTab;
+  final void Function(String)? onTabChanged;
+
+  const Tabbing({super.key, required this.selectedTab, this.onTabChanged});
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          width: 327,
-          height: 36,
-          padding: const EdgeInsets.all(2),
-          clipBehavior: Clip.antiAlias,
-          decoration: ShapeDecoration(
-            color: Color(0xFFF5F6F9),
-            shape: RoundedRectangleBorder(
-              side: BorderSide(width: 1, color: Color(0xFFF5F5F9)),
-              borderRadius: BorderRadius.circular(7),
+    return Container(
+      width: 327,
+      height: 36,
+      padding: const EdgeInsets.all(2),
+      clipBehavior: Clip.antiAlias,
+      decoration: ShapeDecoration(
+        color: const Color(0xFFF5F6F9),
+        shape: RoundedRectangleBorder(
+          side: const BorderSide(width: 1, color: Color(0xFFF5F5F9)),
+          borderRadius: BorderRadius.circular(7),
+        ),
+      ),
+      child: Row(
+        children: [
+          // Log In Button
+          Expanded(
+            child: GestureDetector(
+              onTap: () => onTabChanged?.call("Log In"),
+              child: Container(
+                height: double.infinity,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 12,
+                ),
+                clipBehavior: Clip.antiAlias,
+                decoration: ShapeDecoration(
+                  color:
+                      selectedTab == "Log In"
+                          ? const Color(0xFF6F619B)
+                          : const Color(0xFFF5F6F9),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(7),
+                  ),
+                  shadows:
+                      selectedTab == "Log In"
+                          ? [
+                            const BoxShadow(
+                              color: Color(0x3DE4E5E7),
+                              blurRadius: 2,
+                              offset: Offset(0, 1),
+                              spreadRadius: 0,
+                            ),
+                          ]
+                          : null,
+                ),
+                child: Center(
+                  child: Text(
+                    'Войти',
+                    style: TextStyle(
+                      color:
+                          selectedTab == "Log In"
+                              ? Colors.white
+                              : const Color(0xFF7D7D91),
+                      fontSize: 12,
+                      fontFamily: 'Inter',
+                      height: 0.11,
+                      letterSpacing: -0.28,
+                    ),
+                  ),
+                ),
+              ),
             ),
           ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Expanded(
-                child: Container(
-                  height: double.infinity,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 12,
+          const SizedBox(width: 1),
+          // Sign Up Button
+          Expanded(
+            child: GestureDetector(
+              onTap: () => onTabChanged?.call("Sign Up"),
+              child: Container(
+                height: double.infinity,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 12,
+                ),
+                clipBehavior: Clip.antiAlias,
+                decoration: ShapeDecoration(
+                  color:
+                      selectedTab == "Sign Up"
+                          ? const Color(0xFF6F619B)
+                          : const Color(0xFFF5F6F9),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(7),
                   ),
-                  clipBehavior: Clip.antiAlias,
-                  decoration: ShapeDecoration(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(7),
+                  shadows:
+                      selectedTab == "Sign Up"
+                          ? [
+                            const BoxShadow(
+                              color: Color(0x3DE4E5E7),
+                              blurRadius: 2,
+                              offset: Offset(0, 1),
+                              spreadRadius: 0,
+                            ),
+                          ]
+                          : null,
+                ),
+                child: Center(
+                  child: Text(
+                    'Зарегистрироваться',
+                    style: TextStyle(
+                      color:
+                          selectedTab == "Sign Up"
+                              ? Colors.white
+                              : const Color(0xFF7D7D91),
+                      fontSize: 12,
+                      fontFamily: 'Inter',
+                      height: 0.11,
+                      letterSpacing: -0.28,
                     ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Log In',
-                        style: TextStyle(
-                          color: Color(0xFF7D7D91),
-                          fontSize: 14,
-                          fontFamily: 'Inter',
-                          height: 0.11,
-                          letterSpacing: -0.28,
-                        ),
-                      ),
-                    ],
                   ),
                 ),
               ),
-              const SizedBox(width: 1),
-              Expanded(
-                child: Container(
-                  height: double.infinity,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 12,
-                  ),
-                  clipBehavior: Clip.antiAlias,
-                  decoration: ShapeDecoration(
-                    color: Color(0xFF6F619B),
-                    shape: RoundedRectangleBorder(
-                      side: BorderSide(width: 1, color: Color(0x7FEFF0F6)),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    shadows: [
-                      BoxShadow(
-                        color: Color(0x3DE4E5E7),
-                        blurRadius: 2,
-                        offset: Offset(0, 1),
-                        spreadRadius: 0,
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Sign up',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 14,
-                          fontFamily: 'Inter',
-                          height: 0.11,
-                          letterSpacing: -0.28,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
 
 class SignIn extends StatelessWidget {
-  const SignIn({super.key});
+  final String selectedTab;
+  final Future<void> Function() onFacebookLogin;
+
+  const SignIn({
+    super.key,
+    required this.selectedTab,
+    required this.onFacebookLogin,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -275,11 +321,11 @@ class SignIn extends StatelessWidget {
               border: InputBorder.none,
               isCollapsed: true, // <-- pozwala lepiej kontrolować wysokość
             ),
-            style: TextStyle(fontSize: 14),
+            style: TextStyle(fontSize: 14, fontFamily: 'Inter'),
           ),
         ),
 
-        const SizedBox(height: 16),
+        const SizedBox(height: 8),
 
         // Hasło
         Container(
@@ -294,13 +340,219 @@ class SignIn extends StatelessWidget {
           child: const TextField(
             obscureText: true,
             decoration: InputDecoration(
-              hintText: 'Hasło',
+              hintText: 'Пароль',
               border: InputBorder.none,
               isCollapsed: true,
             ),
-            style: TextStyle(fontSize: 14),
+            style: TextStyle(fontSize: 14, fontFamily: 'Inter'),
           ),
         ),
+        const SizedBox(height: 32),
+        SizedBox(
+          height: 46,
+          width: double.infinity,
+          child: ElevatedButton(
+            onPressed: () {
+              // logika rejestracji
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Color(0xFF6F619B), // kolor tła
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8), // taki sam jak input
+              ),
+              padding: EdgeInsets.zero, // usuwa domyślne paddingi
+            ),
+            child: Text(
+              selectedTab == "sign Up" ? 'Зарегистрироваться' : 'Войти',
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 14),
+        Row(
+          children: [
+            Expanded(
+              child: Container(
+                height: 1, // <-- wysokość linii
+                color: Colors.white, // <-- kolor linii
+              ),
+            ),
+            const SizedBox(width: 16),
+            Text(
+              'Или войдите через',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Color(0xFF6C7278),
+                fontSize: 12,
+                fontFamily: 'Inter',
+                height: 1.4, // poprawiona wysokość tekstu
+                letterSpacing: -0.12,
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(child: Container(height: 1, color: Colors.white)),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Container(
+          width: 345,
+          height: 48,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Container(
+                  height: 48,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 10,
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  decoration: ShapeDecoration(
+                    color: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      side: BorderSide(width: 1, color: Color(0xFFEFF0F6)),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: 18,
+                        height: 18,
+                        clipBehavior: Clip.antiAlias,
+                        decoration: BoxDecoration(),
+                        child: SvgPicture.asset(
+                          'assets/images/auth_google.svg',
+                          width: 50,
+                          height: 50,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 15),
+              Expanded(
+                child: GestureDetector(
+                  onTap: onFacebookLogin,
+                  child: Container(
+                    height: 48,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 10,
+                    ),
+                    clipBehavior: Clip.antiAlias,
+                    decoration: ShapeDecoration(
+                      color: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        side: BorderSide(width: 1, color: Color(0xFFEFF0F6)),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: 18,
+                          height: 18,
+                          clipBehavior: Clip.antiAlias,
+                          decoration: BoxDecoration(),
+                          child: SvgPicture.asset(
+                            'assets/images/auth_fb.svg',
+                            width: 50,
+                            height: 50,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 15),
+              Expanded(
+                child: Container(
+                  height: 48,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 10,
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  decoration: ShapeDecoration(
+                    color: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      side: BorderSide(width: 1, color: Color(0xFFEFF0F6)),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: 18,
+                        height: 18,
+                        padding: const EdgeInsets.symmetric(horizontal: 1.66),
+                        clipBehavior: Clip.antiAlias,
+                        decoration: BoxDecoration(),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              child: Container(
+                                height: double.infinity,
+                                child: SvgPicture.asset(
+                                  'assets/images/auth_apple.svg',
+                                  width: 50,
+                                  height: 50,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        // // Hasło
+        // Container(
+        //   height: 46,
+        //   decoration: BoxDecoration(
+        //     color: Colors.white,
+        //     borderRadius: BorderRadius.circular(8),
+        //     border: Border.all(color: Color(0xFFE5E7EB)),
+        //   ),
+        //   padding: const EdgeInsets.symmetric(horizontal: 12),
+        //   alignment: Alignment.center,
+        //   child: const TextField(
+        //     obscureText: true,
+        //     decoration: InputDecoration(
+        //       hintText: 'Повторите пароль',
+        //       border: InputBorder.none,
+        //       isCollapsed: true,
+        //     ),
+        //     style: TextStyle(fontSize: 14),
+        //   ),
+        // ),
       ],
     );
   }

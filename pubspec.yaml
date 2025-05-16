@@ -74,6 +74,9 @@ flutter:
     - assets/images/ellipse.png
     - assets/images/ellipse.svg
     - assets/images/auth_ellipse.svg
+    - assets/images/auth_google.svg
+    - assets/images/auth_fb.svg
+    - assets/images/auth_apple.svg
 
     - assets/nav_icons/home.svg
     - assets/nav_icons/home_active.svg
