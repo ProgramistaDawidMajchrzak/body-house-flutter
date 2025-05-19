@@ -1,8 +1,10 @@
 import 'dart:convert';
-import 'dart:ui';
+// import 'dart:ui';
+import 'package:body_house_app/core/network/api_client.dart';
 import 'package:body_house_app/core/theme/colors.dart';
+import 'package:body_house_app/data/datasources/user_remote_datasource.dart';
 import 'package:body_house_app/layouts/layout.dart';
-import 'package:body_house_app/screens/test.dart';
+// import 'package:body_house_app/screens/test.dart';
 import 'package:body_house_app/widgets/app_text.dart';
 import 'package:body_house_app/widgets/gradient_text.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +12,8 @@ import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 final FlutterSecureStorage secureStorage = FlutterSecureStorage();
 
@@ -22,6 +26,49 @@ class AuthScreen extends StatefulWidget {
 
 class _AuthScreenState extends State<AuthScreen> {
   String selectedTab = "Sign Up"; // domyślnie Sign Up
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final UserRemoteDataSource _userRemoteDataSource = UserRemoteDataSource(
+    ApiClient(),
+  );
+
+  bool _isLoading = false;
+  String? _error;
+
+  void _login() async {
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
+
+    try {
+      final email = _emailController.text.trim();
+      final password = _passwordController.text.trim();
+
+      final response = await _userRemoteDataSource.login(email, password);
+
+      final token = response['token'];
+      final user = response['user'];
+
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('auth_token', token);
+      await prefs.setString('user', jsonEncode(user));
+      if (!mounted) return; // jeśli jesteś w async metodzie w StatefulWidget
+      Navigator.pushNamed(context, '/profile');
+    } catch (e) {
+      setState(() {
+        _error = 'Błąd logowania: ${e.toString()}';
+      });
+      // print(
+      //   "###################################### ERROR #####################################",
+      // );
+      // print(e.toString());
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
   void onTabChanged(String tab) {
     setState(() {
@@ -35,6 +82,7 @@ class _AuthScreenState extends State<AuthScreen> {
     );
 
     if (result.status == LoginStatus.success) {
+      print("#################################Result: $result");
       print(
         "#################################AccessToken: ${result.accessToken!.tokenString}",
       );
@@ -52,10 +100,16 @@ class _AuthScreenState extends State<AuthScreen> {
         final data = jsonDecode(response.body);
         final token = data['token'];
         final user = data['user'];
-        await secureStorage.write(key: 'jwt_token', value: token);
 
-        print("Zalogowano jako: ${user['email']}, token zapisany");
-        // Tutaj zapisujesz token i przechodzisz dalej
+        // Zapis do SharedPreferences
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('auth_token', token);
+        await prefs.setString('user', jsonEncode(user));
+
+        print("✅ Zalogowano jako: ${user['email']}");
+
+        // Nawigacja do profilu
+        Navigator.pushNamed(context, '/profile');
       } else {
         print("Błąd logowania przez backend: ${response.body}");
       }
@@ -64,11 +118,48 @@ class _AuthScreenState extends State<AuthScreen> {
     }
   }
 
-  //wylogowanie
-  // Future<void> logout() async {
-  //   await secureStorage.delete(key: 'jwt_token');
-  //   print("Wylogowano i usunięto token.");
-  // }
+  Future<void> loginWithGoogle() async {
+    try {
+      final googleSignIn = GoogleSignIn(scopes: ['email']);
+      final googleUser = await googleSignIn.signIn();
+
+      if (googleUser == null) {
+        print("❌ Anulowano logowanie Google");
+        return;
+      }
+
+      final googleAuth = await googleUser.authentication;
+      final idToken = googleAuth.idToken;
+
+      if (idToken == null) {
+        print("❌ Nie udało się pobrać ID Tokena");
+        return;
+      }
+
+      final response = await http.post(
+        Uri.parse('http://10.0.2.2:5000/api/auth/google'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'idToken': idToken}),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final token = data['token'];
+        final user = data['user'];
+
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('auth_token', token);
+        await prefs.setString('user', jsonEncode(user));
+
+        print("✅ Zalogowano przez Google: ${user['email']}");
+        Navigator.pushNamed(context, '/profile');
+      } else {
+        print("❌ Błąd backendu: ${response.body}");
+      }
+    } catch (e) {
+      print("❌ Błąd logowania Google: $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -151,6 +242,10 @@ class _AuthScreenState extends State<AuthScreen> {
                   SignIn(
                     selectedTab: selectedTab,
                     onFacebookLogin: loginWithFacebook,
+                    onGoogleLogin: loginWithGoogle,
+                    onLogInPressed: _login,
+                    emailController: _emailController,
+                    passwordController: _passwordController,
                   ),
                 ],
               ),
@@ -292,11 +387,19 @@ class Tabbing extends StatelessWidget {
 class SignIn extends StatelessWidget {
   final String selectedTab;
   final Future<void> Function() onFacebookLogin;
+  final Future<void> Function() onGoogleLogin;
+  final VoidCallback onLogInPressed;
+  final TextEditingController emailController;
+  final TextEditingController passwordController;
 
   const SignIn({
     super.key,
     required this.selectedTab,
     required this.onFacebookLogin,
+    required this.onGoogleLogin,
+    required this.emailController,
+    required this.passwordController,
+    required this.onLogInPressed,
   });
 
   @override
@@ -314,14 +417,15 @@ class SignIn extends StatelessWidget {
           ),
           padding: const EdgeInsets.symmetric(horizontal: 12),
           alignment: Alignment.center,
-          child: const TextField(
+          child: TextField(
+            controller: emailController,
             keyboardType: TextInputType.emailAddress,
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               hintText: 'Email',
               border: InputBorder.none,
               isCollapsed: true, // <-- pozwala lepiej kontrolować wysokość
             ),
-            style: TextStyle(fontSize: 14, fontFamily: 'Inter'),
+            style: const TextStyle(fontSize: 14, fontFamily: 'Inter'),
           ),
         ),
 
@@ -337,14 +441,15 @@ class SignIn extends StatelessWidget {
           ),
           padding: const EdgeInsets.symmetric(horizontal: 12),
           alignment: Alignment.center,
-          child: const TextField(
+          child: TextField(
+            controller: passwordController,
             obscureText: true,
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               hintText: 'Пароль',
               border: InputBorder.none,
               isCollapsed: true,
             ),
-            style: TextStyle(fontSize: 14, fontFamily: 'Inter'),
+            style: const TextStyle(fontSize: 14, fontFamily: 'Inter'),
           ),
         ),
         const SizedBox(height: 32),
@@ -352,9 +457,7 @@ class SignIn extends StatelessWidget {
           height: 46,
           width: double.infinity,
           child: ElevatedButton(
-            onPressed: () {
-              // logika rejestracji
-            },
+            onPressed: onLogInPressed,
             style: ElevatedButton.styleFrom(
               backgroundColor: Color(0xFF6F619B), // kolor tła
               shape: RoundedRectangleBorder(
@@ -363,7 +466,7 @@ class SignIn extends StatelessWidget {
               padding: EdgeInsets.zero, // usuwa domyślne paddingi
             ),
             child: Text(
-              selectedTab == "sign Up" ? 'Зарегистрироваться' : 'Войти',
+              selectedTab == "Sign Up" ? 'Зарегистрироваться' : 'Войти',
               style: const TextStyle(
                 color: Colors.white,
                 fontSize: 14,
@@ -407,37 +510,40 @@ class SignIn extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
-                child: Container(
-                  height: 48,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 10,
-                  ),
-                  clipBehavior: Clip.antiAlias,
-                  decoration: ShapeDecoration(
-                    color: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      side: BorderSide(width: 1, color: Color(0xFFEFF0F6)),
-                      borderRadius: BorderRadius.circular(10),
+                child: GestureDetector(
+                  onTap: onGoogleLogin,
+                  child: Container(
+                    height: 48,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 10,
                     ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Container(
-                        width: 18,
-                        height: 18,
-                        clipBehavior: Clip.antiAlias,
-                        decoration: BoxDecoration(),
-                        child: SvgPicture.asset(
-                          'assets/images/auth_google.svg',
-                          width: 50,
-                          height: 50,
-                        ),
+                    clipBehavior: Clip.antiAlias,
+                    decoration: ShapeDecoration(
+                      color: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        side: BorderSide(width: 1, color: Color(0xFFEFF0F6)),
+                        borderRadius: BorderRadius.circular(10),
                       ),
-                    ],
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: 18,
+                          height: 18,
+                          clipBehavior: Clip.antiAlias,
+                          decoration: BoxDecoration(),
+                          child: SvgPicture.asset(
+                            'assets/images/auth_google.svg',
+                            width: 50,
+                            height: 50,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
