@@ -18,7 +18,6 @@ class SessionOfADay extends StatelessWidget {
             height: 120,
             child: Stack(
               children: [
-                // Tło - obrazek
                 ClipRRect(
                   borderRadius: BorderRadius.circular(20),
                   child: Image.asset(
@@ -28,8 +27,6 @@ class SessionOfADay extends StatelessWidget {
                     height: double.infinity,
                   ),
                 ),
-
-                // Nowy label w prawym górnym rogu
                 Positioned(
                   top: 0,
                   right: 0,

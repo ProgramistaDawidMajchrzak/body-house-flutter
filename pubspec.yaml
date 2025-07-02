@@ -45,6 +45,8 @@ dependencies:
   intl: ^0.20.2
   flutter_launcher_icons: ^0.14.4
   flutter_native_splash: ^2.4.6
+  table_calendar: ^3.2.0
+  flutter_time_picker_spinner: ^2.0.0
 
 dev_dependencies:
   flutter_test:
@@ -115,8 +117,10 @@ flutter:
 
     - assets/images/time.svg
     - assets/images/time_black.svg
+    - assets/images/time_blue.svg
     - assets/images/difficulty.svg
     - assets/images/difficulty_black.svg
+    - assets/images/difficulty_blue.svg
     - assets/images/excercises.svg
     - assets/images/start_btn.svg
 

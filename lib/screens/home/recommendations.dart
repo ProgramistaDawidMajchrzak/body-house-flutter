@@ -1,4 +1,5 @@
 import 'package:body_house_app/core/theme/colors.dart';
+import 'package:body_house_app/screens/home/my_sessions.dart';
 import 'package:flutter/material.dart';
 
 class Recommendations extends StatelessWidget {
@@ -36,16 +37,7 @@ class Recommendations extends StatelessWidget {
             children: List.generate(5, (index) {
               return Padding(
                 padding: const EdgeInsets.only(right: 12.0),
-                child: Container(
-                  width: 152,
-                  height: 135,
-                  decoration: ShapeDecoration(
-                    color: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                  ),
-                ),
+                child: SessionSmall(),
               );
             }),
           ),
