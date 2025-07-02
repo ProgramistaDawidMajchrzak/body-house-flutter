@@ -11,6 +11,12 @@ class CustomNavBar extends StatelessWidget {
     final route = ModalRoute.of(context);
     final currentPath = route?.settings.name ?? '/home';
 
+    final normalizedPath = (currentPath == '/' ? '/home' : currentPath);
+
+    // print("--------------------------------------");
+    // print('Current route in NavBar: $currentPath');
+    // print("--------------------------------------");
+
     return SafeArea(
       top: false,
       child: ClipRRect(
@@ -25,12 +31,14 @@ class CustomNavBar extends StatelessWidget {
                 _buildIcon(
                   context,
                   currentPath: currentPath,
+                  normalizedPath: normalizedPath,
                   path: '/home',
                   icon: 'home',
                 ),
                 _buildIcon(
                   context,
                   currentPath: currentPath,
+                  normalizedPath: normalizedPath,
                   path: '/sessions',
                   icon: 'sessions',
                 ),
@@ -38,12 +46,14 @@ class CustomNavBar extends StatelessWidget {
                 _buildIcon(
                   context,
                   currentPath: currentPath,
+                  normalizedPath: normalizedPath,
                   path: '/calendar',
                   icon: 'calendar',
                 ),
                 _buildIcon(
                   context,
                   currentPath: currentPath,
+                  normalizedPath: normalizedPath,
                   path: '/profile',
                   icon: 'profile',
                 ),
@@ -73,10 +83,11 @@ class CustomNavBar extends StatelessWidget {
   Widget _buildIcon(
     BuildContext context, {
     required String currentPath,
+    required String normalizedPath,
     required String path,
     required String icon,
   }) {
-    final isActive = currentPath == path;
+    final isActive = normalizedPath == path;
     return IconButton(
       icon: SvgPicture.asset(
         'assets/nav_icons/$icon${isActive ? "_active" : ""}.svg',

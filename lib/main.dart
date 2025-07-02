@@ -51,6 +51,7 @@ class _MyAppState extends State<MyApp> {
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      // initialRoute: '/home',
       onGenerateRoute: RouteGenerator.generateRoute,
       theme: appTheme,
       title: 'Body House',

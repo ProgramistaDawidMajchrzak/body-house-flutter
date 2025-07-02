@@ -8,17 +8,18 @@ import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 
 class RouteGenerator {
-  static Route<dynamic>? generateRoute(RouteSettings settings) {
-    final dynamic args = settings.arguments;
+  static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
-      //ONBOARDING
+      case '/':
       case '/home':
+        // return MaterialPageRoute(builder: (_) => const HomeScreen());
         return PageTransition(
           child: const HomeScreen(),
           type: PageTransitionType.fade,
           settings: settings,
         );
       case '/sessions':
+        // return MaterialPageRoute(builder: (_) => const ShopScreen());
         return PageTransition(
           child: const SessionScreen(),
           type: PageTransitionType.fade,
@@ -48,7 +49,13 @@ class RouteGenerator {
           type: PageTransitionType.fade,
           settings: settings,
         );
+      default:
+        return MaterialPageRoute(
+          builder:
+              (_) => Scaffold(
+                body: Center(child: Text('Unknown route: ${settings.name}')),
+              ),
+        );
     }
-    return null;
   }
 }
