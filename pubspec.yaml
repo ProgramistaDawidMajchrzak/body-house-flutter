@@ -42,6 +42,7 @@ dependencies:
   flutter_secure_storage: ^9.2.4
   shared_preferences: ^2.5.3
   google_sign_in: ^6.3.0
+  intl: ^0.20.2
 
 dev_dependencies:
   flutter_test:
@@ -90,6 +91,13 @@ flutter:
     - assets/nav_icons/profile_active.svg
 
     - assets/images/nav_bar_logo.svg
+
+    - assets/images/time.svg
+    - assets/images/difficulty.svg
+    - assets/images/excercises.svg
+
+    - assets/images/session_sample.jpg
+    - assets/images/session_sample1.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

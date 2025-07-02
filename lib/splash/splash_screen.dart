@@ -13,20 +13,19 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  int _type = 1;
+  int _type = 4;
   double _opacity = 1.0;
 
   void _changeType() async {
     setState(() {
-      _opacity = 0.0; // najpierw znika
+      _opacity = 0.0;
     });
 
-    // Czekamy na zakończenie animacji znikania
     await Future.delayed(const Duration(milliseconds: 300));
 
     setState(() {
-      _type = _type == 4 ? 1 : _type + 1; // zmieniamy typ
-      _opacity = 1.0; // pojawia się ponownie
+      _type = _type == 4 ? 1 : _type + 1;
+      _opacity = 1.0;
     });
   }
 

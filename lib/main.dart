@@ -5,8 +5,12 @@ import 'package:body_house_app/screens/profile/auth/auth_screen.dart';
 import 'package:body_house_app/screens/home/home_screen.dart';
 import 'splash/splash_screen.dart';
 import 'core/theme/theme.dart';
+import 'package:intl/date_symbol_data_local.dart'; // <- wymagane
 
-void main() {
+// 🔧 Uczyń main() asynchronicznym
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await initializeDateFormatting('ru_RU', null); // <- lokalizacja rosyjska
   runApp(const MyApp());
 }
 
